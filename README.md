@@ -30,5 +30,6 @@ Incomes
 ### Стек проекта:
 
 http    -   flask
+
 db      -   psycopg2
 
