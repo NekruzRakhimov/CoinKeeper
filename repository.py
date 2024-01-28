@@ -5,6 +5,7 @@ from models import Category, MoneyMovement
 from datetime import datetime
 # import psycopg2
 from security import *
+from pprint import pprint
 
 
 """
@@ -71,10 +72,9 @@ def add_actions(_action: str, _category_id: int, _category_id_source: int, _amou
             db.commit()
 
     elif _action.lower() == 'expense':
-        _amount = (-1)*_amount
         with Session(autoflush=False, bind=engine) as db:
             db.add(MoneyMovement(created_at=datetime.utcnow(), action=_action, category_id=_category_id, category_id_source=_category_id_source,
-                                 last_balance=get_last_balance(_category_id_source)+_amount, amount=_amount, description=_description))
+                                 last_balance=get_last_balance(_category_id_source)-_amount, amount=_amount, description=_description))
             db.commit()
 
     elif _action.lower() == 'move':
@@ -83,8 +83,9 @@ def add_actions(_action: str, _category_id: int, _category_id_source: int, _amou
             db.add(MoneyMovement(created_at=now, action=_action, category_id=_category_id, category_id_source=_category_id_source,
                                  last_balance=get_last_balance(_category_id_source)-_amount, amount=_amount, description=_description))
             db.add(MoneyMovement(created_at=now, action=_action, category_id=_category_id_source, category_id_source=_category_id,
-                                 last_balance=get_last_balance(_category_id)-_amount, amount=_amount, description=_description))
+                                 last_balance=get_last_balance(_category_id)+_amount, amount=_amount, description=_description))
             db.commit()
+
 
 '''
 if program gets slow we can use it for make faster
@@ -103,3 +104,51 @@ cur.close()
 conn.close()
 
 '''
+
+
+def report_expense_bydate_and_bytitle(from_date, till_date, title_name='') -> list:
+    '''from_date and tille_date takes date time in fromat year-./month-./day
+        if you need to know exact what type of category's amount just type name in title_name
+    '''
+
+    with Session(autoflush=False, bind=engine) as db:
+        result = db.query(Category.title, func.sum(MoneyMovement.amount)).join(MoneyMovement, 
+        Category.id == MoneyMovement.category_id).filter(Category.title.ilike("%{}%".format(title_name)),
+        MoneyMovement.action == 'expense', 
+        MoneyMovement.created_at.between(from_date, till_date)).group_by(Category.title).all()
+    return result
+
+
+def report_balance_bydate(balance_date, name_balance=''):
+
+    'Need to work !!! some problems'
+
+    
+    with Session(autoflush=False, bind=engine) as db:
+        
+        subquery = (db.query(MoneyMovement.category_id_source,
+            func.max(MoneyMovement.created_at).label('latest_created_at')
+        ).group_by(MoneyMovement.category_id_source).subquery()
+        )
+
+        result = (db.query(Category.title, MoneyMovement.last_balance)
+        .join(subquery, Category.id == subquery.c.category_id_source)
+        .join(MoneyMovement,(subquery.c.category_id_source == MoneyMovement.category_id_source)
+            & (subquery.c.latest_created_at == MoneyMovement.created_at)
+        ).filter(Category.title.ilike("%{}%".format(name_balance)), MoneyMovement.created_at <= balance_date)
+        .all()
+        )
+
+    return result
+
+
+def report_income_bydare_and_bytitle(from_date, till_date, title_name='') -> list:
+    '''from_date and tille_date takes date time in fromat year-./month-./day
+        if you need to know exact what type of category's amount just type name in title_name
+    '''
+    with Session(autoflush=False, bind=engine) as db:
+        result = db.query(Category.title, func.sum(MoneyMovement.amount)).join(MoneyMovement, 
+        Category.id == MoneyMovement.category_id).filter(Category.title.ilike("%{}%".format(title_name)),
+        MoneyMovement.action == 'income', MoneyMovement.amount > 0,
+        MoneyMovement.created_at.between(from_date, till_date)).group_by(Category.title).all()
+    return result
