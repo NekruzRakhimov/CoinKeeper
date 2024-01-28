@@ -10,7 +10,7 @@ def index():
 
 
 # Получение списка категорий
-@app.route('/balances', methods=['GET'])
+@app.route('/categories', methods=['GET'])
 def categories_dict():
     serialized_categories = []
     categories = repository.categories_dict()
