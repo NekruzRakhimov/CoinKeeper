@@ -4,8 +4,7 @@ from sqlalchemy import create_engine
 
 
 # Атрибут подключения для движка SQLAlchemy.
-DATABASE_URL = f'postgresql+psycopg2://{
-    user_app}:{password_app}@{host_app}:{port_app}/{dbname_app}'
+DATABASE_URL = f"postgresql://{user_app}:{password_app}@{host_app}:{port_app}/{dbname_app}"
 
 # Создаём движок SQLAlchemy.
 engine = create_engine(DATABASE_URL, echo=True)
