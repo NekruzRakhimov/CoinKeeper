@@ -10,4 +10,3 @@ DATABASE_URL = f"postgresql://{user_app}:{password_app}@{host_app}:{port_app}/{d
 engine = create_engine(DATABASE_URL, echo=True)
 
 # Создаем класс последующих сессий, на основе которого будут создаваться разовые экземпляры для разовых подключений.
-Session = sessionmaker(bind=engine)
