@@ -1,7 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy import Column, String, Integer, SmallInteger, Numeric, Boolean, DateTime, ForeignKey
 from sqlalchemy.sql.expression import text
-
 from connection import engine
 
 
@@ -12,7 +11,7 @@ class Base(DeclarativeBase):
 class Category(Base):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
+    title = Column(String, unique=True)
     title_type = Column(String)
     description = Column(String)
 
