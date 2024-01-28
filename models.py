@@ -12,7 +12,7 @@ class Base(DeclarativeBase):
 class Category(Base):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
+    title = Column(String, unique=True)
     title_type = Column(String)
     description = Column(String)
 

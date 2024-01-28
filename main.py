@@ -4,7 +4,6 @@ from models import Base
 from connection import engine
 
 Base.metadata.create_all(bind=engine)
-
 # Create app
 app = Flask(__name__)
 app.register_blueprint(routes_app)
