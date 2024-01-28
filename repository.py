@@ -21,7 +21,7 @@ def add_category(_title, _title_type, _description=''):
     """
     with Session(autoflush=False, bind=engine) as db:
         db.add(Category(title=_title, title_type=_title_type,
-               description=_description))
+                        description=_description))
         db.commit()
 
 
@@ -57,8 +57,10 @@ def add_actions(_action, _category_id, _category_id_source, _amount, _descriptio
         return _last_balance.__dict__['last_balance']
 
     with Session(autoflush=False, bind=engine) as db:
-        db.add(MoneyMovement(created_at=datetime.utcnow(), action=_action, category_id=_category_id, category_id_source=_category_id_source,
-               last_balance=get_last_balance(_category_id_source)+_amount, amount=_amount, description=_description))
+        db.add(MoneyMovement(created_at=datetime.utcnow(), action=_action, category_id=_category_id,
+                             category_id_source=_category_id_source,
+                             last_balance=get_last_balance(_category_id_source) + _amount, amount=_amount,
+                             description=_description))
         db.commit()
 
 
