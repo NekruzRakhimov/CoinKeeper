@@ -7,6 +7,6 @@ from sqlalchemy import create_engine
 DATABASE_URL = f"postgresql://{user_app}:{password_app}@{host_app}:{port_app}/{dbname_app}"
 
 # Создаём движок SQLAlchemy.
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=False)
 
 # Создаем класс последующих сессий, на основе которого будут создаваться разовые экземпляры для разовых подключений.

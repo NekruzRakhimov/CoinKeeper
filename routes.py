@@ -14,17 +14,8 @@ def index():
 def categories_dict():
     serialized_categories = []
     categories = repository.categories_dict()
-    # balances = [{'id': 1,
-    #              'title': 'Мой баланс',
-    #              'balance': 10000},
-    #             {'id': 2,
-    #              'title': 'Мой баланс2',
-    #              'balance': 20000}]
-
     for category in categories:
-        # dict_balance = balance.__dict__
-        # del dict_balance['_sa_intence_state']
-        categories_dict.append(category)
+        serialized_categories.append(category)
     return {'Categories': serialized_categories}, 200
 
 
