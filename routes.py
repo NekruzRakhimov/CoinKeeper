@@ -1,4 +1,5 @@
 from flask import jsonify, request, Blueprint
+import repository
 
 app = Blueprint('routes', __name__)
 
@@ -8,23 +9,23 @@ def index():
     return {"Status": "Up"}, 200
 
 
-# Получение списка балансов
+# Получение списка категорий
 @app.route('/balances', methods=['GET'])
-def get_balances():
-    serialized_balances = []
-    # balances = repository.get_balances()
-    balances = [{'id': 1,
-                 'title': 'Мой баланс',
-                 'balance': 10000},
-                {'id': 2,
-                 'title': 'Мой баланс2',
-                 'balance': 20000}]
+def categories_dict():
+    serialized_categories = []
+    categories = repository.categories_dict()
+    # balances = [{'id': 1,
+    #              'title': 'Мой баланс',
+    #              'balance': 10000},
+    #             {'id': 2,
+    #              'title': 'Мой баланс2',
+    #              'balance': 20000}]
 
-    for balance in balances:
+    for category in categories:
         # dict_balance = balance.__dict__
         # del dict_balance['_sa_intence_state']
-        serialized_balances.append(balance)
-    return {'Balances': serialized_balances}, 200
+        categories_dict.append(category)
+    return {'Categories': serialized_categories}, 200
 
 
 # Получение списка расходов
