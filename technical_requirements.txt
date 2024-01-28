@@ -12,6 +12,34 @@ Balances
 Incomes
     id, title, amount
 
+
+---------------------------
+Я изменил структура база данных что бы отчеты были лехче 
+
+2 tables
+
+1) Category
+    id, title, type_of_title, description
+
+    1 | Cash  | balance      | money which is in my hand
+    2 | Alif  | balance      | my electronic 
+    3 | freelance | income   | -
+    4 | Taxi  | expense      | -
+    5 | Food  | expense      | -
+    6 | clothes | expense    | -
+    7 | Cola    | expense    | -
+
+
+2) money_movement
+    id, created_at, action, category_id, category_id_source, last_balance, amount, description
+
+    1 | 27.01.2024 18:23:00 | income | 3 | 1 | 0 | +500 | back project
+    2 | 27.01.2024 18:27:00 | expense| 4 | 1 | 500 | -50 | go home
+
+    3 | 27.01.2024 18:27:00 | move   | 2 | 1 | 450 | -100| 
+    4 | 27.01.2024 18:27:00 | move   | 1 | 2 | 0   | +100|
+
+    
 _______________________
 0. Начальная настройка проекта
 1. Список Балансов
