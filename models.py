@@ -10,7 +10,7 @@ class Base(DeclarativeBase):
 
 
 class Category(Base):
-    __tablename__ = "category"
+    __tablename__ = "categoryes"
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, unique=True)
     type_of_title = Column(String)
@@ -23,7 +23,7 @@ class MoneyMovement(Base):
     action = Column(String)
     category_id = Column(ForeignKey("category.id"))
     category_id_source = Column(ForeignKey("category.id"))
-    last_balance = Column(Integer)
+    last_balance = Column(Integer, default=1000)
     amount = Column(Integer)
     description = Column(String)
 

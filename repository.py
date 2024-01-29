@@ -4,7 +4,6 @@ from models import *
 from datetime import datetime
 
 Session = sessionmaker(bind=engine)
-
 Base.metadata.create_all(bind=engine)
 
 def add_category(_title, _title_of_type, _description):
@@ -37,14 +36,17 @@ add_category("такси", 1, "довез до дома")
 def pay_expense(_title, _get_balance_id, _category_id_source, _amount, _description):
     with Session(autoflush=False, bind=engine) as db:
         expense = db.query(Category).filter(Category.type_of_title == "expense", Category.title == _title).first()
-        last_balance = db.query(MoneyMovement.last_balance).filter(MoneyMovement.category_id_source == _category_id_source).order_by(MoneyMovement.id.desc()).first()[0]
+        with Session(autoflush=False, bind=engine) as db:
+            _last_balance = db.query(MoneyMovement).order_by(MoneyMovement.id.desc()).filter(
+                MoneyMovement.category_id_source == _category_id_source).first()
 
+        _last_balance = _last_balance.__dict__['last_balance']
         if expense:
             new_money_movement = MoneyMovement(
                 action="expense",
                 category_id=expense.id,
                 category_id_source=_category_id_source,
-                last_balance=last_balance,
+                last_balance=_last_balance,
                 amount=_amount,
                 description=_description,
                 created_at=datetime.now()
