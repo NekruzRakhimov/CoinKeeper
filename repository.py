@@ -81,25 +81,6 @@ def add_actions(_action: str, _category_id: int, _category_id_source: int, _amou
             db.commit()
 
 
-'''
-if program gets slow we can use it for make faster
-
-
-
-conn = psycopg2.connect(dbname=dbname_app, user=user_app,
-                        password=password_app, host=host_app, port=port_app)
-cur = conn.cursor()
-cur.execute("""SELECT last_balance FROM MoneyMovement
-WHERE id = (SELECT MAX(id) FROM MoneyMovement) AND category_id_source = 1;
-""")
-
-print(cur)
-cur.close()
-conn.close()
-
-'''
-
-
 def report_expense_bydate_and_bytitle(from_date, till_date, title_name='') -> list:
     '''from_date and tille_date takes date time in fromat year-./month-./day
         if you need to know exact what type of category's amount just type name in title_name
@@ -145,3 +126,21 @@ def report_income_bydare_and_bytitle(from_date, till_date, title_name='') -> lis
                                                                                                                                 MoneyMovement.action == 'income', MoneyMovement.amount > 0,
                                                                                                                                 MoneyMovement.created_at.between(from_date, till_date)).group_by(Category.title).all()
     return result
+
+
+'''
+if program gets slow we can use it for make faster
+
+
+conn = psycopg2.connect(dbname=dbname_app, user=user_app,
+                        password=password_app, host=host_app, port=port_app)
+cur = conn.cursor()
+cur.execute("""SELECT last_balance FROM MoneyMovement
+WHERE id = (SELECT MAX(id) FROM MoneyMovement) AND category_id_source = 1;
+""")
+
+print(cur)
+cur.close()
+conn.close()
+
+'''
