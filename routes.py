@@ -1,5 +1,4 @@
 import repository
-from models import Accounts
 from flask import jsonify, request, render_template, Blueprint
 
 
@@ -33,21 +32,36 @@ def add_category():
 
 
 # Получение списка расходов
+@app.route('/expense', methods=['GET'])
+def get_all_expenses():
+    serialized_expenses = []
+    all_expenses = repository.categories_dict()
+    for expense in all_expenses:
+        if expense['title_type'] == 'expense':
+            serialized_expenses.append(expense)
+    return {'expense': serialized_expenses}, 200
+
+
+# Получение списка доходов
 @app.route('/incomes', methods=['GET'])
-def get_incomes():
+def get_all_incomes():
     serialized_incomes = []
-    # all_incomes = repository.get_incomes()
-    all_incomes = [{'id': 1,
-                    'title': 'Мои траты',
-                    'amount': 990},
-                   {'id': 2,
-                    'title': 'Мои траты2',
-                    'amount': 1990}]
+    all_incomes = repository.categories_dict()
     for income in all_incomes:
-        # dict_incomes = income.__dict__
-        # del dict_incomes['_sa_intence_state']
-        serialized_incomes.append(income)
-    return {'Incomes': serialized_incomes}, 200
+        if income['title_type'] == 'income':
+            serialized_incomes.append(income)
+    return {'incomes': serialized_incomes}, 200
+
+
+# Получение списка балансов
+@app.route('/balances', methods=['GET'])
+def get_all_balances():
+    serialized_balances = []
+    all_balances = repository.categories_dict()
+    for balance in all_balances:
+        if balance['title_type'] == 'balance':
+            serialized_balances.append(balance)
+    return {'incomes': serialized_balances}, 200
 
 
 # Пополнение баланса
