@@ -1,80 +1,124 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, func
+from sqlalchemy.orm import sessionmaker
 from connection import engine
-from models import Category, MoneyMovement
+from models import *
 from datetime import datetime
-#import psycopg2
-from security import *
+
+Session = sessionmaker(bind=engine)
+
+Base.metadata.create_all(bind=engine)
+
+def add_expense_categories(_title, _description):
+    try:
+        with Session() as db:
+            new_categorie = Categories(title=_title, description=_description)
+            db.add(new_categorie)
+            db.commit()
+            return new_categorie
+
+    except BaseException as e:
+        return e
+
+add_expense_categories("Такси", "довез до дома")
+
+def add_balance(_title, _balance):
+    try:
+        with Session() as db:
+            new_balance = Balances(title=_title, balance=_balance)
+            db.add(new_balance)
+            db.commit()
+            return new_balance
+
+    except BaseException as e:
+        return e
 
 
-def add_category(_title, _title_type, _description=''):
-    """
-    In table for 4 colums
-    id | title | title_type | description
-    --------------------------------------
-    1  | Freelance | income |
-    2  | Taxi      | expense|
-    3  | Cash      | balance| money which is in my hand
+# add_balance("Наличка", 500)
 
+def add_expense(_description_id, _amount, _balance_id):
+    with Session() as db:
+        try:
+            get_description = db.query(Categories).filter_by(id=_description_id).first()
+            new_expense = Expenses(description=get_description.description, category_id=get_description.id, amount=_amount, balance_id=_balance_id, created_at=datetime.now())
+            db.add(new_expense)
+            balance = db.query(Balances).filter_by(id=_balance_id).first()
+            if balance.balance >= new_expense.amount:
+                balance.balance -= new_expense.amount
+                db.commit()
+            return new_expense
+        except BaseException as e:
+            return e
 
-    title_type is case sensitive be carefule while typing
-    """
-    with Session(autoflush=False, bind=engine) as db:
-        db.add(Category(title=_title, title_type=_title_type,
-               description=_description))
-        db.commit()
+# add_expense(1, 1500, 1)
 
+def pay_expense(description, _get_balance_id):
+    with Session() as db:
+        try:
+            expense = db.query(Expenses).filter_by(description=description).first()
+            if expense:
+                balance = db.query(Balances).filter_by(id=_get_balance_id).first()
+                if balance.balance >= expense.amount:
+                    balance.balance -= expense.amount
+                    db.delete(expense)
+                    db.commit()
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        except BaseException as e:
+            return e
 
-def categories_dict(_title_type='') -> list:
-    """
-    Returning all categories in form list and each element is dict
-    """
-    with Session(autoflush=False, bind=engine) as db:
-        categories = db.query(Category).filter(
-            Category.title_type.ilike("%{}".format(_title_type)))
-        free_list = []
-        for category in categories:
-            category = category.__dict__
-            del category['_sa_instance_state']
-            free_list.append(category)
+pay_expense("довез до дома", 1)
 
-    return free_list
+def top_balance(_get_balance_id, amount):
+    with Session() as db:
+        try:
+            balance = db.query(Balances).filter_by(id=_get_balance_id).first()
+            if 5000 >= amount:
+                balance.balance += amount
+                db.commit()
+                return True
+            else:
+                return False
+        except BaseException as e:
+            return e
 
+# top_balance(1, 100)
 
-def category_id_return(_title):
-    with Session(autoflush=False, bind=engine) as db:
-        _id = db.query(Category).filter(Category.title == _title).first()
-        _id = _id.__dict__['id']
-        return _id
+def get_expenses():
+    with Session() as db:
+        try:
+            expenses = db.query(Expenses).all()
+            list_expenses = []
+            for expens in expenses:
+                dict_expenses = {
+                    'id': expens.id,
+                    'description': expens.description,
+                    'category_id': expens.category_id,
+                    'amount': expens.amount,
+                    'created_at': expens.created_at
+                }
+                list_expenses.append(dict_expenses)
+            return list_expenses
+        except BaseException as e:
+            return e
 
+def get_balances():
+    with Session() as db:
+        try:
+            expenses = db.query(Balances).all()
+            list_balances = []
+            for expens in expenses:
+                dict_balances = {
+                    'id': expens.id,
+                    'title': expens.title,
+                    'balance': expens.balance
+                }
+                list_balances.append(dict_balances)
+            return list_balances
+        except BaseException as e:
+            return e
 
-def add_actions(_action, _category_id, _category_id_source, _amount, _description=""):
-    def get_last_balance(_category_id_source):
-        with Session(autoflush=False, bind=engine) as db:
-            _last_balance = db.query(MoneyMovement).order_by(MoneyMovement.id.desc()).filter(
-                MoneyMovement.category_id_source == _category_id_source).first()
-
-        return _last_balance.__dict__['last_balance']
-
-    with Session(autoflush=False, bind=engine) as db:
-        db.add(MoneyMovement(created_at=datetime.utcnow(), action=_action, category_id=_category_id, category_id_source=_category_id_source,
-               last_balance=get_last_balance(_category_id_source)+_amount, amount=_amount, description=_description))
-        db.commit()
-
-'''
-if program gets slow we can use it for make faster
-
-
-
-conn = psycopg2.connect(dbname=dbname_app, user=user_app,
-                        password=password_app, host=host_app, port=port_app)
-cur = conn.cursor()
-cur.execute("""SELECT last_balance FROM MoneyMovement
-WHERE id = (SELECT MAX(id) FROM MoneyMovement) AND category_id_source = 1;
-""")
-
-print(cur)
-cur.close()
-conn.close()
-
-'''
+print(get_balances())
+# print(get_expenses())
+# top_balance(1, 100)
