@@ -20,47 +20,65 @@ def add_category(_title, _title_of_type, _description):
                 print("Unexpected _title_of_type")
                 return False
 
-            new_categorie = Category(title=_title, description=_description, title_of_type=_title_of_type)
-            db.add(new_categorie)
+            new_category = Category(title=_title, description=_description, type_of_title=_title_of_type)
+            db.add(new_category)
             db.commit()
-            return new_categorie
+            return new_category
 
     except BaseException as e:
         return e
 
 add_category("Cash", 2, "money which is in my hand")
-'''
-def add_income(_title, _description):
-    try:
-        with Session() as db:
-            new_categorie = Categories(title=_title, amount=amount)
-            db.add(new_categorie)
-            db.commit()
-            return new_categorie
-
-    except BaseException as e:
-        return e
-'''
+add_category("такси", 1, "довез до дома")
 
 
-# add_balance("Наличка", 500)
 
-
-# add_expense(1, 1500, 1)
 
 def pay_expense(_title, _get_balance_id, _category_id_source, _amount, _description):
-    with Session() as db:
-        expense = db.query(Category).filter_by(title_of_type="expense", title=_title)
-        if expense:
-            _last_balance = db.query(MoneyMovement).order_by(MoneyMovement.id.desc()).filter(
-                MoneyMovement.category_id_source == _category_id_source).first()
-            new_money_movement = MoneyMovement(action="expense", category_id=expense.id, category_id_source=_category_id_source, last_balance=_last_balance - _amount, amount=_amount, description=_description)
-            db.add(new_money_movement)
+    with Session(autoflush=False, bind=engine) as db:
+        expense = db.query(Category).filter(Category.type_of_title == "expense", Category.title == _title).first()
+        last_balance = db.query(MoneyMovement.last_balance).filter(MoneyMovement.category_id_source == _category_id_source).order_by(MoneyMovement.id.desc()).first()[0]
 
+        if expense:
+            new_money_movement = MoneyMovement(
+                action="expense",
+                category_id=expense.id,
+                category_id_source=_category_id_source,
+                last_balance=last_balance,
+                amount=_amount,
+                description=_description,
+                created_at=datetime.now()
+            )
+
+            db.add(new_money_movement)
+            db.commit()
+            return True
         else:
             return False
 
-pay_expense("довез до дома", 1)
+
+def get_balance_for_check():
+    with Session(autoflush=False, bind=engine) as db:
+        money_movement_list = []
+        money_movements = db.query(MoneyMovement).all()
+        for money_movement in money_movements:
+            get_check = {
+                'id': money_movement.id,
+                'created_at': money_movement.created_at,
+                'action': money_movement.action,
+                'category_id': money_movement.category_id,
+                'category_id_source': money_movement.category_id_source,
+                'last_balance': money_movement.last_balance,
+                'amount': money_movement.amount,
+                'description': money_movement.description
+            }
+            money_movement_list.append(get_check)
+
+        return money_movement_list
+
+
+print(get_balance_for_check())
+print(pay_expense("такси", 2, 2, 10, "оплатил такси"))
 
 def top_balance(_get_balance_id, amount):
     with Session() as db:
@@ -77,6 +95,7 @@ def top_balance(_get_balance_id, amount):
 
 # top_balance(1, 100)
 
+# add_category("Cash", 2, "money which is in my hand")
 def get_expenses():
     with Session() as db:
         try:
@@ -110,6 +129,18 @@ def get_balances():
             return list_balances
         except BaseException as e:
             return e
+'''
+def add_income(_title, _description):
+    try:
+        with Session() as db:
+            new_categorie = Categories(title=_title, amount=amount)
+            db.add(new_categorie)
+            db.commit()
+            return new_categorie
+
+    except BaseException as e:
+        return e
+'''
 
 # print(get_balances())
 # print(get_expenses())
