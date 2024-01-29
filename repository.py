@@ -81,7 +81,7 @@ def add_actions(_action: str, _category_id: int, _category_id_source: int, _amou
             db.commit()
 
 
-def report_expense_bydate_and_bytitle(from_date, till_date, title_name='') -> list:
+def report_expense_by_date_and_by_title(from_date, till_date, title_name='') -> list:
     '''from_date and tille_date takes date time in fromat year-./month-./day
         if you need to know exact what type of category's amount just type name in title_name
     '''
@@ -94,7 +94,7 @@ def report_expense_bydate_and_bytitle(from_date, till_date, title_name='') -> li
     return result
 
 
-def report_balance_bydate(balance_date, name_balance=''):
+def report_balance_by_date(balance_date, name_balance=''):
     'Need to work !!! some problems'
 
     with Session(autoflush=False, bind=engine) as db:
@@ -116,7 +116,7 @@ def report_balance_bydate(balance_date, name_balance=''):
     return result
 
 
-def report_income_bydare_and_bytitle(from_date, till_date, title_name='') -> list:
+def report_income_by_date_and_by_title(from_date, till_date, title_name='') -> list:
     '''from_date and tille_date takes date time in fromat year-./month-./day
         if you need to know exact what type of category's amount just type name in title_name
     '''
