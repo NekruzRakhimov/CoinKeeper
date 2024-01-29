@@ -9,21 +9,13 @@ class Base(DeclarativeBase):
     pass
 
 
-class Categories(Base):
-    __tablename__ = "categories"
+class Category(Base):
+    __tablename__ = "category"
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, unique=True)
-    title_type = Column(String)
+    type_of_title = Column(String)
     description = Column(String)
 
-
-class Balances(Base):
-    __tablename__ = "balances"
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, unique=True)
-    balance = Column(Integer, default=100)
-
-'''
 class MoneyMovement(Base):
     __tablename__ = "money_movement"
     id = Column(Integer, primary_key=True, index=True)
@@ -34,7 +26,13 @@ class MoneyMovement(Base):
     last_balance = Column(Integer)
     amount = Column(Integer)
     description = Column(String)
+
 '''
+class Balances(Base):
+    __tablename__ = "balances"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, unique=True)
+    balance = Column(Integer, default=100)
 
 class Expenses(Base):
     __tablename__ = "expenses"
@@ -52,3 +50,4 @@ class Incomes(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, unique=True)
     amount = Column(Integer)
+'''

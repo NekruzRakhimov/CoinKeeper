@@ -7,10 +7,20 @@ Session = sessionmaker(bind=engine)
 
 Base.metadata.create_all(bind=engine)
 
-def add_expense_categories(_title, _description):
+def add_category(_title, _title_of_type, _description):
     try:
         with Session() as db:
-            new_categorie = Categories(title=_title, description=_description)
+            if _title_of_type == 1:
+                _title_of_type = "expense"
+            elif _title_of_type == 2:
+                _title_of_type = "balance"
+            elif _title_of_type == 3:
+                _title_of_type = "income"
+            else:
+                print("Unexpected _title_of_type")
+                return False
+
+            new_categorie = Category(title=_title, description=_description, title_of_type=_title_of_type)
             db.add(new_categorie)
             db.commit()
             return new_categorie
@@ -18,55 +28,32 @@ def add_expense_categories(_title, _description):
     except BaseException as e:
         return e
 
-add_expense_categories("Такси", "довез до дома")
-
-def add_balance(_title, _balance):
+add_category("Такси", 1, "довез до дома")
+'''
+def add_income(_title, _description):
     try:
         with Session() as db:
-            new_balance = Balances(title=_title, balance=_balance)
-            db.add(new_balance)
+            new_categorie = Categories(title=_title, amount=amount)
+            db.add(new_categorie)
             db.commit()
-            return new_balance
+            return new_categorie
 
     except BaseException as e:
         return e
+'''
 
 
 # add_balance("Наличка", 500)
 
-def add_expense(_description_id, _amount, _balance_id):
-    with Session() as db:
-        try:
-            get_description = db.query(Categories).filter_by(id=_description_id).first()
-            new_expense = Expenses(description=get_description.description, category_id=get_description.id, amount=_amount, balance_id=_balance_id, created_at=datetime.now())
-            db.add(new_expense)
-            balance = db.query(Balances).filter_by(id=_balance_id).first()
-            if balance.balance >= new_expense.amount:
-                balance.balance -= new_expense.amount
-                db.commit()
-            return new_expense
-        except BaseException as e:
-            return e
 
 # add_expense(1, 1500, 1)
 
-def pay_expense(description, _get_balance_id):
+def pay_expense(_title, _get_balance_id, _category_id_source,amount):
     with Session() as db:
-        try:
-            expense = db.query(Expenses).filter_by(description=description).first()
-            if expense:
-                balance = db.query(Balances).filter_by(id=_get_balance_id).first()
-                if balance.balance >= expense.amount:
-                    balance.balance -= expense.amount
-                    db.delete(expense)
-                    db.commit()
-                    return True
-                else:
-                    return False
-            else:
-                return False
-        except BaseException as e:
-            return e
+        expense = db.query(Category).filter_by(title_of_type="expense", title=_title)
+        if expense:
+            get_last_balance = db.query(MoneyMovement).
+            new_money_movement = MoneyMovement(action="expense", category_id=expense.id, category_id_source=_category_id_source, last_balance)
 
 pay_expense("довез до дома", 1)
 
@@ -119,6 +106,6 @@ def get_balances():
         except BaseException as e:
             return e
 
-print(get_balances())
+# print(get_balances())
 # print(get_expenses())
 # top_balance(1, 100)
