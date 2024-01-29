@@ -109,6 +109,10 @@ class Categories(Base):
     description = Column(String)
 
 
+
+
+
+
 class Balances(Base):
     __tablename__ = "balances"
     id = Column(Integer, primary_key=True, index=True)

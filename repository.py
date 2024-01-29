@@ -200,9 +200,45 @@ def add_expense(_description_id, _amount, _balance_id):
             return e
 
 # add_expense(1, 1500, 1)
+'''
+def update_expense(_new_description, _title, _new_title, title_or_description):
+    with Session(autoflush=False, bind=engine) as db:
+        get_expense_for_update = db.query(Categories).filter_by(title=_title, title_type="expense")
+        if title_or_description == 1:
+            if get_expense_for_update:
+                get_expense_for_update.description = _new_description
+                # get_expense_for_update.balance_id = _new_balance_id
+
+            elif get_expense_for_update == 2:
+                get_expense_for_update.title = _new_title
+
+            db.commit()
+            return True
+        else:
+            return False
+'''
+
+def edit_expense_category(db: Session, category_id: int, new_data: dict):
+    category_to_edit = db.query(Categories).filter(Categories.id == category_id).first()
+    if category_to_edit:
+        for key, value in new_data.items():
+            setattr(category_to_edit, key, value)
+        db.commit()
+        db.refresh(category_to_edit)
+        return category_to_edit
+
+def edit_income_category(db: Session, category_id: int, new_data: dict):
+    category_to_edit = db.query(Incomes).filter(Incomes.id == category_id).first()
+    if category_to_edit:
+        for key, value in new_data.items():
+            setattr(category_to_edit, key, value)
+        db.commit()
+        db.refresh(category_to_edit)
+        return category_to_edit
+
 
 def pay_expense(description, _get_balance_id):
-    with Session() as db:
+    with Session(autoflush=False, bind=engine) as db:
         try:
             expense = db.query(Expenses).filter_by(description=description).first()
             if expense:
@@ -218,6 +254,19 @@ def pay_expense(description, _get_balance_id):
                 return False
         except BaseException as e:
             return e
+
+def delete_expense_categorie(_title, _get_balance_id):
+    with Session(autoflush=False, bind=engine) as db:
+        expense = db.query(Categories).filter_by(title=_title, title_type="expense").first()
+        db.delete(expense)
+
+def delete_expense(_title, _get_balance_id):
+    with Session(autoflush=False, bind=engine) as db:
+        expense = db.query(Expenses).filter_by(title=_title).first()
+        if expense.amount <= 0:
+            db.delete(expense)
+        else:
+            pay_expense(_title, _get_balance_id)
 
 def pay_income(_title, _get_balance_id):
     with Session() as db:
@@ -236,6 +285,22 @@ def pay_income(_title, _get_balance_id):
                 return False
         except BaseException as e:
             return e
+
+def delete_income_categorie(_title, _get_balance_id):
+    with Session(autoflush=False, bind=engine) as db:
+        income = db.query(Categories).filter_by(title=_title, title_type="income").first()
+        db.delete(income)
+
+def delete_income(_title, _get_balance_id):
+    with Session(autoflush=False, bind=engine) as db:
+        income = db.query(Incomes).filter_by(title=_title, title_type="income").first()
+        if income.amount <= 0:
+            db.delete(income)
+
+        else:
+            pay_income(_title, _get_balance_id)
+
+
 
 pay_expense("довез до дома", 1)
 
@@ -275,19 +340,85 @@ def get_expenses():
 def get_balances():
     with Session() as db:
         try:
-            expenses = db.query(Balances).all()
+            balances = db.query(Balances).all()
             list_balances = []
-            for expens in expenses:
+            for balance in balances:
                 dict_balances = {
-                    'id': expens.id,
-                    'title': expens.title,
-                    'balance': expens.balance
+                    'id': balance.id,
+                    'title': balance.title,
+                    'balance': balance.balance
                 }
                 list_balances.append(dict_balances)
             return list_balances
         except BaseException as e:
             return e
 
-print(get_balances())
+def get_uniq_balances(_title):
+    with Session() as db:
+        try:
+            balance = db.query(Balances).filter_by(title=_title).first()
+            list_balance = []
+            dict_balance = {
+                'id': balance.id,
+                'title': balance.title,
+                'balance': balance.balance
+            }
+            list_balance.append(dict_balance)
+            return list_balance
+        except BaseException as e:
+            return e
+
+def get_expense_categorie():
+    with Session() as db:
+        try:
+            expense_categories = db.query(Categories).filter_by(title_type='expense').all()
+            list_expense_categories = []
+            for expense_categorie in expense_categories:
+                dict_expense_categorie = {
+                    'id': expense_categorie.id,
+                    'title': expense_categorie.title,
+                    'title_type': expense_categorie.title_type,
+                    'description': expense_categorie.description
+                }
+                list_expense_categories.append(dict_expense_categorie)
+            return list_expense_categories
+        except BaseException as e:
+            return e
+
+def get_incomes():
+    with Session() as db:
+        try:
+            incomes = db.query(Incomes).all()
+            list_incomes = []
+            for income in incomes:
+                dict_incomes = {
+                    'id': income.id,
+                    'title': income.title,
+                    'amount': income.amount
+                }
+                list_incomes.append(dict_incomes)
+            return list_incomes
+        except BaseException as e:
+            return e
+
+def get_uniq_income(_title):
+    with Session() as db:
+        try:
+            income = db.query(Incomes).filter_by(title=_title).first()
+            return income
+        except BaseException as e:
+            return e
+
+def get_uniq_expense(_title):
+    with Session() as db:
+        try:
+            expense = db.query(Expenses).filter_by(title=_title).first()
+            return expense
+        except BaseException as e:
+            return e
+
+
+
+# print(get_balances())
 # print(get_expenses())
 # top_balance(1, 100)
