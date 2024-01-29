@@ -21,6 +21,17 @@ def categories_dict():
     return {'Categories': serialized_categories}, 200
 
 
+# Создание категории
+@app.route('/categories/create', methods=['POST'])
+def add_category():
+    data = request.get_json()
+    title = data['title']
+    title_type = data['title_type']
+    description = data['description']
+    repository.add_category(title, title_type, description)
+    return {'status': 'successfully added'}, 201
+
+
 # Получение списка расходов
 @app.route('/incomes', methods=['GET'])
 def get_incomes():
