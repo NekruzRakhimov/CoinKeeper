@@ -4,15 +4,6 @@ from connection import engine
 from models import Category, MoneyMovement
 from datetime import datetime
 # import psycopg2
-from security import *
-from pprint import pprint
-
-
-"""
-
-
-"""
-
 
 def add_category(_title, _title_type, _description=''):
     """
@@ -82,8 +73,8 @@ def add_actions(_action: str, _category_id: int, _category_id_source: int, _amou
             now = datetime.utcnow()
             db.add(MoneyMovement(created_at=now, action=_action, category_id=_category_id, category_id_source=_category_id_source,
                                  last_balance=get_last_balance(_category_id_source)-_amount, amount=_amount, description=_description))
-            db.add(MoneyMovement(created_at=now, action=_action, category_id=_category_id_source, category_id_source=_category_id,
-                                 last_balance=get_last_balance(_category_id)+_amount, amount=_amount, description=_description))
+            db.add(MoneyMovement(created_at=now, action=_action, category_id_source=_category_id,
+                                 last_balance=get_last_balance(_category_id)+_amount, description='Move'+_description))
             db.commit()
 
 
