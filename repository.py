@@ -28,7 +28,7 @@ def add_category(_title, _title_of_type, _description):
     except BaseException as e:
         return e
 
-add_category("Такси", 1, "довез до дома")
+add_category("Cash", 2, "money which is in my hand")
 '''
 def add_income(_title, _description):
     try:
@@ -48,12 +48,17 @@ def add_income(_title, _description):
 
 # add_expense(1, 1500, 1)
 
-def pay_expense(_title, _get_balance_id, _category_id_source,amount):
+def pay_expense(_title, _get_balance_id, _category_id_source, _amount, _description):
     with Session() as db:
         expense = db.query(Category).filter_by(title_of_type="expense", title=_title)
         if expense:
-            get_last_balance = db.query(MoneyMovement).
-            new_money_movement = MoneyMovement(action="expense", category_id=expense.id, category_id_source=_category_id_source, last_balance)
+            _last_balance = db.query(MoneyMovement).order_by(MoneyMovement.id.desc()).filter(
+                MoneyMovement.category_id_source == _category_id_source).first()
+            new_money_movement = MoneyMovement(action="expense", category_id=expense.id, category_id_source=_category_id_source, last_balance=_last_balance - _amount, amount=_amount, description=_description)
+            db.add(new_money_movement)
+
+        else:
+            return False
 
 pay_expense("довез до дома", 1)
 
