@@ -43,7 +43,7 @@ def increase_balance_endpoint(balance_id):
 @app.route('/expense_categories', methods=['GET'])
 def expense_categories():
     '''Получение списка категорий расходов'''
-    categories = get_expense_categories()
+    categories = repository.get_expense_categories()
     return jsonify(categories), 200
 
 
