@@ -1,17 +1,10 @@
-import psycopg2
-
 from security import dbname_app, user_app, password_app, host_app, port_app
+from sqlalchemy import create_engine, Column, String, Integer, SmallInteger, Numeric, Boolean, DateTime, ForeignKey, or_
+from sqlalchemy.sql.expression import text
+from sqlalchemy.orm import DeclarativeBase, sessionmaker, relationship
 
+# Атрибут подключения для движка SQLAlchemy.
+DATABASE_URL = f"postgresql://{user_app}:{password_app}@{host_app}:{port_app}/{dbname_app}"
 
-# connect db
-# Подключаем базу для дальнейшей работы
-conn = psycopg2.connect(dbname=dbname_app,
-                        user=user_app,
-                        password=password_app,
-                        host=host_app,
-                        port=port_app)
-conn.set_client_encoding('UTF8')
-# conn.autocommit = True
-cursor = conn.cursor()
-
-##############################
+# Создаём движок SQLAlchemy.
+engine = create_engine(DATABASE_URL, echo=False)
