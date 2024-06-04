@@ -43,7 +43,9 @@ def categories_dict(_title_type='') -> list:
 
 
 def category_info_return(_title):
-    "Takes name of category and return all info about category in dict"
+    """
+    Takes name of category and return all info about category in dict
+    """
     with Session(autoflush=False, bind=engine) as db:
         item = db.query(Category).filter(Category.title == _title).first()
         item = item.__dict__
