@@ -1,7 +1,11 @@
+
+![Python](https://img.shields.io/badge/Python-3.9-blue)
+![Flask](https://img.shields.io/badge/Flask-2.0.2-green)
+
+
 ##### _____________________________________
 
-## Приложение:
-# **COIN Keeper**.
+# **Название проекта: COIN Keeper**.
 
 ##### _____________________________________
 
